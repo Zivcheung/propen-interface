@@ -1,5 +1,5 @@
 let webpack = require("webpack")
 
-export default new webpack.ProvidePlugin({
+module.exports=new webpack.ProvidePlugin({
     "_": "lodash"
 })

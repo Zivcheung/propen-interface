@@ -15,6 +15,9 @@ module.exports = {
   plugins: [
     'vue'
   ],
+  globals: {
+    '_': true,
+  },
   // check if imports actually resolve
   settings: {
     'import/resolver': {
@@ -45,6 +48,11 @@ module.exports = {
       optionalDependencies: ['test/unit/index.js']
     }],
     // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'no-multiple-empty-lines':['off'],
+    'no-console':'off',
+    'no-unused-expressions':['error',{
+      'allowShortCircuit': true,
+    }],
   }
 }

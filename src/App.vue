@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
     <router-view/>
   </div>
 </template>
@@ -11,6 +10,9 @@ export default {
 };
 </script>
 
-<style>
+<!-- add global css -->
+<style src="@/main.css"></style>
+<style src="@/reset.css"></style>
 
-</style>
+
+
