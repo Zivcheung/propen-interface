@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="17px" viewBox="0 0 12 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
+    <title>Shape</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="playbar/voiceOver" transform="translate(-20.000000, -12.000000)" fill="#31E6C2">
+            <g id="Bar">
+                <path d="M23.1800332,13.3238704 L30.790298,18.8852178 C31.6821176,19.5369321 31.8767614,20.7882136 31.225047,21.6800332 C31.1034047,21.8464911 30.9567559,21.9931399 30.790298,22.1147822 L23.1800332,27.6761296 C22.2882136,28.3278439 21.0369321,28.1332001 20.3852178,27.2413805 C20.1349059,26.8988485 20,26.4855928 20,26.0613474 L20,14.9386526 C20,13.8340831 20.8954305,12.9386526 22,12.9386526 C22.4242455,12.9386526 22.8375012,13.0735585 23.1800332,13.3238704 Z" id="Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>

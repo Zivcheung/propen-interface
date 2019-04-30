@@ -1,7 +1,9 @@
 <template>
   <div class="window-page-wp">
     <top-nav></top-nav>
-    <section class="gallery-wall" ref="galleryWall" @click="wallClickHandler($event)">
+    <section class="gallery-wall"
+    ref="galleryWall"
+    :style="{height: wallSize.height+'px'}">
       <div class="gallery-wall__scroll" :style="{'margin-top':hangingPos+'px'}">
         <template v-for="(project , i) in projects">
           <gallery-card
@@ -12,6 +14,7 @@
           ></gallery-card>
         </template>
       </div>
+      <div class="gallery-wall__vertical-plane"></div>
     </section>
   </div>
 </template>
@@ -43,50 +46,53 @@ export default {
       },
     };
   },
+  computed: {
+  },
   methods: {
     resetHangingPos() {
       const galleryCardHeight = 442;
       const wallSize = window.innerHeight - 50;
       const center = (wallSize / 2) - (galleryCardHeight / 2);
-      this.hangingPos = center - 40;
+      this.hangingPos = center - (wallSize * 0.01);
 
-      //change wallSize global
+      // change wallSize global
       this.wallSize.height = wallSize;
       this.wallSize.width = window.innerWidth;
-
     },
-    openPreviewHandler(eid,i,e) {
+    openPreviewHandler(eid) {
       // closed prev opened card
       this.openedCard && (this.openedCard.openState = false);
-      const card = _.find(this.projects, i => i.eid === eid);
+      const card = _.find(this.projects, item => item.eid === eid);
       card.openState = true;
       // setTimeout(() => {
       //   this.centerCard(i)},300)
       // cache
       this.openedCard = card;
     },
-    wallClickHandler(e){
+    wallClickHandler() {
       this.openedCard && (this.openedCard.openState = false);
     },
     centerCard(i) {
       const me = this;
-      const dist = ((i * 326) + 430) - (this.wallSize.width / 2) + 300;
+      const dist = (((i * 326) + 430) - (this.wallSize.width / 2)) + 300;
       let td = me.$refs.galleryWall.scrollLeft;
 
       (function animateCenter() {
         td += 40;
         me.$refs.galleryWall.scrollLeft = td;
-        if(td < dist){
+        if (td < dist) {
           requestAnimationFrame(animateCenter);
         }
-      })();
+      }());
     },
   },
   mounted() {
-    this.resetHangingPos();
     // initializing position
-    // window.onresize = function () {
-    // };
+    this.resetHangingPos();
+    window.onresize = () => {
+      this.resetHangingPos();
+    };
+
     // mockup data for gallery project
     for (let i = 0; i < 10; i += 1) {
       this.projects.push({
@@ -102,13 +108,17 @@ export default {
     }
   },
   created() {
+    // interaction methods defined using hammerjs
     this.$nextTick(() => {
       const wallDom = this.$refs.galleryWall;
       const hammer = new Hammer(wallDom);
       hammer.on('pan', (e) => {
         const originX = wallDom.scrollLeft;
-        const panVel = 30;
+        const panVel = 20;
         wallDom.scrollLeft = originX - (e.velocityX * panVel);
+      });
+      hammer.on('tap', () => {
+        this.wallClickHandler();
       });
     });
   },

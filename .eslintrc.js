@@ -17,6 +17,7 @@ module.exports = {
   ],
   globals: {
     '_': true,
+    'PIXI': true,
   },
   // check if imports actually resolve
   settings: {
@@ -54,5 +55,9 @@ module.exports = {
     'no-unused-expressions':['error',{
       'allowShortCircuit': true,
     }],
+    'no-plusplus': 'off',
+    'global-require': 'off',
+    'quotes': ["error","single",{"allowTemplateLiterals":true}],
+    'no-param-reassign':'off'
   }
 }

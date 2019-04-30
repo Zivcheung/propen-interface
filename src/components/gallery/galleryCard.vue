@@ -17,16 +17,21 @@
       <h3 class="gallery-card__abstract-title">{{data.title}}</h3>
       <p class="gallery-card__abstract-author">{{data.author}}</p>
       <p class="gallery-card__abstract-content">{{data.abstract}}</p>
-      <div class="square-btn" @click="enterProjectHandler">Enter</div>
+      <btn class="gallery-card__enter-btn"
+        type="normal"
+        name="Enter"
+        @click="enterProjectHandler"></btn>
     </div>
   </section>
 </template>
 
 <script>
+import btn from 'src/components/common/btn';
+
 export default {
   name: 'galleryCard',
   components: {
-    // btn
+    btn,
   },
   props: {
     openState: false,
@@ -51,11 +56,13 @@ export default {
     enterProjectHandler() {
       // enter project
       console.log('enter project');
-      // this.$route.push('')
+      this.$router.push({
+        path: `/projectIntro/:${this.data.eid}`,
+      });
     },
     clickHandler(e) {
       e.stopPropagation();
-      this.$emit('click', this.data.eid, e)
+      this.$emit('click', this.data.eid, e);
     },
   },
   mounted() {
