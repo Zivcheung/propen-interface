@@ -8,6 +8,8 @@ import research from 'src/pages/research';
 import exhibitionPool from 'src/pages/exhibitionPool';
 import projectIntro from 'src/pages/projectIntro';
 import projectNav from 'src/pages/projectNav';
+import collaboration from 'src/pages/collaboration/mainPanel';
+import compileCanvas from 'src/pages/collaboration/compileCanvas';
 
 Vue.use(Router);
 
@@ -55,6 +57,18 @@ export default new Router({
       path: '/projectNav/:eid',
       name: 'projectNav',
       component: projectNav,
+    },
+    // collaboration
+    {
+      path: '/collaboration',
+      name: 'collaboration',
+      component: collaboration,
+    },
+    // todo: need to add dynamic link
+    {
+      path: '/compileCanvas',
+      name: 'compileCanvas',
+      component: compileCanvas,
     },
   ],
 });
