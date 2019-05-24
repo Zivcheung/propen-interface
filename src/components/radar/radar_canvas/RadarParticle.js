@@ -5,11 +5,12 @@ import particleEngine from './ParticleEngine';
 
 export default class RadarParticle {
   constructor(_domTarget) {
-    this.particleEngine = particleEngine;
     this.texturePattern = img;
     this.dom = document.querySelector(`${_domTarget}`);
     this.canvasWidth = pDataHolder.CANVAS_WIDTH;
     this.canvasHeight = pDataHolder.CANVAS_HEIGHT;
+    this.particleEngine = particleEngine;
+    // need to destory
     this.app = new PIXI.Application({
       width: pDataHolder.CANVAS_WIDTH,
       height: pDataHolder.CANVAS_HEIGHT,
@@ -24,21 +25,26 @@ export default class RadarParticle {
 
     // responsice size
     this.onresize();
-    window.addEventListener('resize', this.onresize);
-
-    window.pixiApp = this.app;
-    PIXI.loader
-      .add(this.texturePattern)
-      .load(this.setup.bind(this));
+    this.resizeListener = window.addEventListener('resize', this.onresize);
   }
   setup() {
-    this.texture = PIXI.loader.resources[this.texturePattern].texture;
-    this.mainContainer = new PIXI.Container();
-    this.particleEngine.setup(this.texture);
-    this.app.stage.addChild(particleEngine.particleContainer);
-    this.activeAnimation = true;
-    this.loop();
-    emiter.$emit('finished:radar');
+    return new Promise((resolve, reject) => {
+      PIXI.loader
+        .add(this.texturePattern)
+        .load(() => {
+          try {
+            this.texture = PIXI.loader.resources[this.texturePattern].texture;
+            this.mainContainer = new PIXI.Container();
+            this.particleEngine.setup(this.texture);
+            this.app.stage.addChild(particleEngine.particleContainer);
+            this.activeAnimation = true;
+            this.loop();
+          } catch (err) {
+            reject(err);
+          }
+          resolve();
+        });
+    });
   }
 
   onresize = () => {
@@ -75,5 +81,16 @@ export default class RadarParticle {
         this.loop();
       });
     }
+  }
+
+  destroy() {
+    this.activeAnimation = false;
+    cancelAnimationFrame(this.tl);
+    this.texture.destroy(true);
+    PIXI.loader.reset();
+    removeEventListener('resize', this.resizeListener);
+    this.particleEngine.destroy();
+    this.app.destroy();
+    console.log('pixi destroyed');
   }
 }

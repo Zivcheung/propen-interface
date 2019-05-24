@@ -10,11 +10,14 @@ import projectIntro from 'src/pages/projectIntro';
 import projectNav from 'src/pages/projectNav';
 import collaboration from 'src/pages/collaboration/mainPanel';
 import compileCanvas from 'src/pages/collaboration/compileCanvas';
+import projectContent from 'src/pages/projectContent';
+import dashboard from 'src/pages/collaboration/dashboard';
+import store from '../store';
 
 Vue.use(Router);
 
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -49,26 +52,53 @@ export default new Router({
 
     // secondary page
     {
-      path: '/projectIntro/:eid',
+      path: '/projectIntro/:id',
       name: 'projectIntro',
       component: projectIntro,
     },
     {
-      path: '/projectNav/:eid',
+      path: '/projectNav/:id',
       name: 'projectNav',
       component: projectNav,
     },
+    {
+      path: '/projectContent',
+      name: 'projectContent',
+      component: projectContent,
+    },
     // collaboration
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: dashboard,
+    },
     {
       path: '/collaboration',
       name: 'collaboration',
+      meta: {
+        auth: 'required',
+      },
       component: collaboration,
     },
     // todo: need to add dynamic link
     {
       path: '/compileCanvas',
       name: 'compileCanvas',
+      meta: {
+        requireAuth: 'required',
+      },
       component: compileCanvas,
     },
   ],
 });
+
+router.beforeEach((to, from, next) => {
+  if (store.state.userStatus !== 'login' &&
+    to.meta.requireAuth) {
+    next('/login');
+    return;
+  }
+  next();
+});
+
+export default router;

@@ -11,6 +11,8 @@ import lang from 'element-ui/lib/locale/lang/en';
 import locale from 'element-ui/lib/locale';
 import 'element-ui/lib/theme-chalk/index.css';
 import elementUI from 'element-ui';
+import mainAxios from 'src/plugins/mainAxios';
+import vueCookies from 'vue-cookies';
 import App from './App';
 import router from './router';
 
@@ -19,9 +21,13 @@ Vue.config.productionTip = false;
 // elementUI dependency
 locale.use(lang);
 Vue.use(elementUI);
+Vue.use(vueCookies);
 
 // provide simple observer channel
 Vue.prototype.$$observer = observer;
+
+// inject global axio ajax plugin
+Vue.prototype.$$axios = mainAxios;
 
 /* eslint-disable no-new */
 new Vue({

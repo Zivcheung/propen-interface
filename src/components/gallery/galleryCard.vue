@@ -5,18 +5,20 @@
   >
     <div class="gallery-card__cover" >
       <div class="gallery-card__cover-left">
-        <img :src="data.coverImg" :alt="'cover image'" draggable="false">
+        <img :src="data.coverImage" :alt="'cover image'" draggable="false">
       </div>
       <div class="gallery-card__cover-right">
-        <img :src="data.coverImg" alt="cover image" draggable="false">
+        <img :src="data.coverImage" alt="cover image" draggable="false">
       </div>
     </div>
     <div class="gallery-card__description">
     </div>
     <div class="gallery-card__abstract">
       <h3 class="gallery-card__abstract-title">{{data.title}}</h3>
+      <p>{{authors}}</p>
+      <p>Published at: {{this.data.publishedAt}}</p>
       <p class="gallery-card__abstract-author">{{data.author}}</p>
-      <p class="gallery-card__abstract-content">{{data.abstract}}</p>
+      <p class="gallery-card__abstract-content">{{introduction}}</p>
       <btn class="gallery-card__enter-btn"
         type="normal"
         name="Enter"
@@ -27,7 +29,6 @@
 
 <script>
 import btn from 'src/components/common/btn';
-
 export default {
   name: 'galleryCard',
   components: {
@@ -52,17 +53,31 @@ export default {
     return {
     };
   },
+  computed: {
+    introduction() {
+      let text = this.data.introduction.slice(0, 300);
+      text = text.replace(/\s\w*$/, '...');
+      return text;
+    },
+    authors() {
+      console.log(typeof this.data.publishedAt)
+      return this.data.authors.reduce((acc, cur, i) => {
+        if (i === 0) return cur.toString();
+        return `${acc}, ${cur}`;
+      }, '');
+    },
+  },
   methods: {
     enterProjectHandler() {
       // enter project
       console.log('enter project');
       this.$router.push({
-        path: `/projectIntro/:${this.data.eid}`,
+        path: `/projectIntro/${this.data.id}`,
       });
     },
     clickHandler(e) {
       e.stopPropagation();
-      this.$emit('click', this.data.eid, e);
+      this.$emit('click', this.data.id, e);
     },
   },
   mounted() {

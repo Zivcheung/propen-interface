@@ -70,4 +70,9 @@ export default {
       this.particles[i].recoverLoop();
     }
   },
+  destroy() {
+    this.particleContainer.destroy();
+    pDataHolder.particles = [];
+    this.particles = pDataHolder.particles;
+  },
 };

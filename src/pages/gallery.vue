@@ -1,15 +1,14 @@
 <template>
   <div class="window-page-wp">
-    <top-nav></top-nav>
     <section class="gallery-wall"
     ref="galleryWall"
     :style="{height: wallSize.height+'px'}">
       <div class="gallery-wall__scroll" :style="{'margin-top':hangingPos+'px'}">
-        <template v-for="(project , i) in projects">
+        <template v-for="(project) in galleryList.list">
           <gallery-card
             :data="project"
-            :key="project.eid"
-            @click="(eid,e)=>openPreviewHandler(eid,i,e)"
+            :key="project.id"
+            @click="(e)=>openPreviewHandler(project.id)"
             :openState="project.openState"
           ></gallery-card>
         </template>
@@ -33,11 +32,13 @@ export default {
   },
   data() {
     return {
-      projects: [],
+      galleryList: {
+        list: [],
+      },
       responsiveStore: {
       },
       hangingPos: 100,
-      // cache
+      // cache opened card, every time open new card close the old one
       openedCard: undefined,
       // window size
       wallSize: {
@@ -49,6 +50,35 @@ export default {
   computed: {
   },
   methods: {
+    requestGalleryList(page, startFrom) {
+      const glist = this.galleryList;
+      this.$$axios.get('/galleryList', {
+        params: {
+          startFrom: startFrom || '',
+          pageNumber: page,
+        },
+      })
+        .then((res) => {
+          const data = res.data;
+          console.log(res);
+          glist.totalCount = data.totalNumber;
+          glist.list = data.galleryList.map((item) => {
+            const publishedAt = new Date(item.publishedAt).toLocaleDateString();
+            return {
+              title: item.title,
+              publishedAt,
+              id: item._id,
+              projectId: item.projectId,
+              authors: item.authors,
+              coverImage: item.coverImage,
+              introduction: item.introduction,
+            };
+          });
+        })
+        .catch(() => {
+          alert('exhibition request failed');
+        });
+    },
     resetHangingPos() {
       const galleryCardHeight = 442;
       const wallSize = window.innerHeight - 50;
@@ -59,14 +89,11 @@ export default {
       this.wallSize.height = wallSize;
       this.wallSize.width = window.innerWidth;
     },
-    openPreviewHandler(eid) {
+    openPreviewHandler(id) {
       // closed prev opened card
       this.openedCard && (this.openedCard.openState = false);
-      const card = _.find(this.projects, item => item.eid === eid);
-      card.openState = true;
-      // setTimeout(() => {
-      //   this.centerCard(i)},300)
-      // cache
+      const card = _.find(this.galleryList.list, item => item.id === id);
+      this.$set(card, 'openState', true);
       this.openedCard = card;
     },
     wallClickHandler() {
@@ -92,20 +119,8 @@ export default {
     window.onresize = () => {
       this.resetHangingPos();
     };
-
     // mockup data for gallery project
-    for (let i = 0; i < 10; i += 1) {
-      this.projects.push({
-        title: 'HOPE',
-        author: 'xavier',
-        eid: `${i}_aa22`,
-        abstract: 'arter frustrates the seed near the once jam. Why won\'t each charm wed under the rabid adult? The french rip dies next to an only microprocessor. The exhibit replies to the fever.Does a chemist flower your philosophical head? The implied drug fishes the annoyed zero. The charter frustrates the seed near the once jam. Why won\'t each charm wed under the rabid adult? The french rip dies next to an only microprocessor. The exhibit replies to the fever.Does a chemist flower your philosophical head? The implied drug fishes the annoyed zero. The charter frustrates the seed near the once jam. Why won\'t each charm wed under the rabid adult? The french rip dies next to an only microprocessor. The exhibit replies to the fever.Does a chemist flower your philosophical head? The implied drug fishes the annoyed zero. The charter frustrates the seed near the once jam. Why won\'t each charm wed under the rabid adult? The french rip dies next to an only microprocessor. The exhibit replies to the fever.',
-        // eslint-disable-next-line
-        coverImg: require('src/assets/project_cover.png'),
-        // control state
-        openState: false,
-      });
-    }
+    this.requestGalleryList(1);
   },
   created() {
     // interaction methods defined using hammerjs

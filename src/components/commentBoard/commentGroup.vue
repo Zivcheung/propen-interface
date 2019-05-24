@@ -27,12 +27,14 @@ export default {
       type: Array,
     },
   },
+  inject: [
+    'location',
+  ],
   data() {
     return {
       cardSize: 240, // card is a 240px square
       cardHeadHeight: 50, // closed tab
       cardsPosition: [],
-      groupHeight: 240,
       layerHeight: 0, // z-index
       openedCards: [],
       groupClasses: {},
@@ -52,6 +54,9 @@ export default {
     },
     cardBodySize() {
       return this.cardSize - this.cardHeadHeight;
+    },
+    groupHeight() {
+      return (this.cardHeadHeight * this.comments.length) + (this.cardSize - this.cardHeadHeight);
     },
   },
   methods: {
@@ -120,7 +125,12 @@ export default {
         e.preventDefault();
         counter = 0;
         this.$set(this.groupClasses, 'is-dragenter', false);
-        observer.$emit('newPostDropped');
+        observer.$emit('newPostDropped', {
+          type: 'FOLLOW_POST',
+          exhibitionId: this.$store.state.exhiStore.currentProject.id, // l1
+          where: this.location, // l2
+          originPostId: this.comments[0]._id, // l3
+        });
       };
     },
   },
@@ -131,6 +141,9 @@ export default {
         this.layerHeight = 0;
       }
     },
+    comments() {
+      this.resetCardsPos();
+    },
   },
   mounted() {
     this.initiateGroupDropEvent();
@@ -138,9 +151,6 @@ export default {
   created() {
     // initiate card position
     this.resetCardsPos();
-    // initiate sum height
-    this.groupHeight =
-      (this.cardHeadHeight * this.comments.length) + (this.cardSize - this.cardHeadHeight);
     // register instance to the cards pool observer store
     observer.$on('singleOpenedGroup', (self) => {
       if (self !== this) {
@@ -149,6 +159,8 @@ export default {
         this.openedCards = [];
       }
     });
+  },
+  updated() {
   },
 };
 </script>

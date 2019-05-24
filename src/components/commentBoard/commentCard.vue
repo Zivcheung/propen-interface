@@ -1,7 +1,7 @@
 <template>
   <section class="comment-card" @click="$emit('click')" ref="card">
     <div class="comment-card__head">
-      <img :src="data.avatar" alt="">
+      <img :src="data.userIcon || defaultUserImage">
       <div class="comment-card__head-username">{{data.username}}</div>
     </div>
     <div class="comment-card__comment">
@@ -13,6 +13,8 @@
 </template>
 
 <script>
+import defaultUserImage from 'src/assets/defaultUserIcon.png';
+
 export default {
   name: 'commentCard',
   props: {
@@ -23,6 +25,7 @@ export default {
   },
   data() {
     return {
+      defaultUserImage,
     };
   },
   mounted() {

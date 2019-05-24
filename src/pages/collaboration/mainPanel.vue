@@ -1,6 +1,5 @@
 <template>
   <article class="window-page-wp">
-    <top-nav></top-nav>
     <canvas-layout :open-right="openRightArea">
       <template v-slot:center>
         <section class="processviz-working-layout" >

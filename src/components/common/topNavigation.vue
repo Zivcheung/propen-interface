@@ -19,19 +19,21 @@
         </div>
         </section>
         <section class="top-nav__account">
-          <template v-if="auth">
-            <div class="top-nav__account-msg">
+          <template v-if="login">
+            <!-- <div class="top-nav__account-msg">
                 <span></span>
-            </div>
+            </div> -->
             <section class="top-nav__account-avatar">
-                <span></span>
+                <div class="top-nav__account-avatar-img">
+                  <img :src="userIcon">
+                </div>
                 <!-- dropdown's show behav is defined in css -->
                 <section class="top-nav__account-avatar-dropdown">
-                    <div class="top-nav__accunt-a-d-link">Personal Board</div>
-                    <div class="top-nav__accunt-a-d-link">Profile</div>
-                    <div class="top-nav__accunt-a-d-link">Account Setting</div>
+                    <el-button type="text" @click="$router.push('/personalBoard')" >Personal Board</el-button>
+                    <el-button type="text">Profile</el-button>
+                    <el-button type="text">Account Setting</el-button>
                     <span class="top-nav__dropdown-spacer"></span>
-                    <div class="top-nav__accunt-a-d-link">Log Out</div>
+                    <el-button type="text" @click="logoutHandler">Log Out</el-button>
                 </section>
             </section>
           </template>
@@ -44,6 +46,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   name: 'top-navigation',
   data() {
@@ -52,13 +56,39 @@ export default {
       auth: false,
     };
   },
+  computed: {
+    ...mapState([
+      'login',
+    ]),
+    userIcon() {
+      return this.$store.userIcon ? this.$store.userIcon : require('src/assets/defaultUserIcon.png');
+    },
+  },
   methods: {
     // events
     linkTo(name) {
       console.log(`jump to ${name}`);
       this.$router.push({ name });
     },
+    logoutHandler() {
+      this.$$axios.get('/logout')
+        .then((res) => {
+          if (res.data.message === 'success') {
+            this.$router.push('/');
+            this.$store.commit('clearUser');
+          }
+        })
+        .catch((err) => {
+          alert(err);
+        });
+    },
     // methods
+    checkUserStatus() {
+      return this.$cookies.get('userStatus') === 'login';
+    },
+
+  },
+  mounted() {
   },
 };
 </script>

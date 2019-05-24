@@ -82,4 +82,7 @@ export default class ContentBtnController {
       this.pPool.push(particles[i]);
     }
   }
+  destroy() {
+    instance = null;
+  }
 }

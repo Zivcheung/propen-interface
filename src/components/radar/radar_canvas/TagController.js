@@ -96,4 +96,7 @@ export default class {
       i++;
     } while (i < len);
   }
+  destroy() {
+    instance = null;
+  }
 }

@@ -1,6 +1,5 @@
 <template>
   <article class="window-page-wp">
-    <top-nav></top-nav>
     <section class='radar-nav'>
       <section class='radar-nav__canvas'>
         <section class='radar-nav__content-holder'>
@@ -13,7 +12,9 @@
         </section>
       </section>
     </section>
-    <comment-board></comment-board>
+    <comment-board
+      where="general">
+    </comment-board>
   </article>
 </template>
 
@@ -27,6 +28,7 @@ import ContentBtn from 'src/components/radar/ContentButton';
 import TagButton from 'src/components/radar/TagButton';
 import topNav from 'src/components/common/topNavigation';
 import commentBoard from 'src/components/commentBoard/commentBoard';
+import { mapState } from 'vuex';
 
 export default {
   components: {
@@ -37,22 +39,22 @@ export default {
   },
   data() {
     return {
-      particles: [],
+      id: '',
       contentBtns: [],
       tagBtns: [],
+      radar: null,
     };
+  },
+  computed: {
+    ...mapState('exhiStore', [
+      'currentProject',
+    ]),
   },
   methods: {
     renderParticle(_domRef) {
-      // const screen = {
-      //   height: window.innerHeight,
-      //   width: window.innerWidth,
-      // };
-      this.radarRender = new RadarParticle(_domRef);
-      this.particles = pDataHolder.particles;
-    },
-    cEvent() {
-      this.radarRender.hover();
+      this.radar = new RadarParticle(_domRef);
+      // call async setup function
+      return this.radar.setup();
     },
     generateMock(_num) {
       const mock = [];
@@ -77,18 +79,63 @@ export default {
       }
       return mock;
     },
+    flattenServerReturnedContent(content) {
+      const pageList = [];
+      const sectionList = [];
+      content.forEach((section) => {
+        // load sections to list for tag;
+        sectionList.push({
+          id: section._id,
+          title: section.sectionName,
+        });
+        // load pages to list for contentButton;
+        section.pages.forEach((page) => {
+          pageList.push({
+            id: page._id,
+            attributes: {
+              title: page.pageName,
+              tags: page.sectionName,
+            },
+          });
+        });
+      });
+      return {
+        pageList,
+        sectionList,
+      };
+    },
+    requestProjectNavigation() {
+      return this.$store.dispatch('exhiStore/requestTocAndContent', this.id);
+    },
   },
-
+  created() {
+    this.id = this.$route.params.id;
+    this.$store.commit('exhiStore/setId', this.id);
+  },
   mounted() {
-    this.renderParticle('.radar-nav__canvas');
     this.buttonController = new ButtonController();
     this.tagController = new TagController();
-    const content = this.generateMock(200);
-    const tagMock = this.generateTagMock(44);
-    emitter.$on('finished:radar', () => {
-      this.contentBtns = this.buttonController.setup(content);
-      this.tagBtns = this.tagController.setup(tagMock);
-    });
+    Promise.all([
+      this.renderParticle('.radar-nav__canvas'),
+      this.requestProjectNavigation(),
+    ])
+      .then(() => {
+        const { pageList, sectionList } =
+          this.flattenServerReturnedContent(this.currentProject.content);
+        this.contentBtns = this.buttonController.setup(pageList);
+        this.tagBtns = this.tagController.setup(sectionList);
+        console.log(this.contentBtns);
+      })
+      .catch((error) => {
+        console.error(error);
+        alert('page loading failed');
+      });
+  },
+  beforeDestroy() {
+    this.radar.destroy();
+    this.buttonController.destroy();
+    this.tagController.destroy();
+    console.log('destroyed');
   },
 };
 </script>

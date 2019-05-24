@@ -1,6 +1,5 @@
 <template>
   <section>
-    <top-nav></top-nav>
     <construction></construction>ß
   </section>
 </template>

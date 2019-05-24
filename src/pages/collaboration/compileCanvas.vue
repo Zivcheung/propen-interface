@@ -1,6 +1,5 @@
 <template>
   <article class="window-page-wp compile-page">
-    <top-nav></top-nav>
    <working-canvas-layout :open-right="openRightArea">
       <template v-slot:center>
          <div class="compile-page__workingspace-editor">
