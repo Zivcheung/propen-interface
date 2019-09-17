@@ -3,23 +3,28 @@
     <section class="gallery-wall"
     ref="galleryWall"
     :style="{height: wallSize.height+'px'}">
-      <div class="gallery-wall__scroll" :style="{'margin-top':hangingPos+'px'}">
-        <template v-for="(project) in galleryList.list">
-          <gallery-card
-            :data="project"
-            :key="project.id"
-            @click="(e)=>openPreviewHandler(project.id)"
-            :openState="project.openState"
-          ></gallery-card>
-        </template>
+      <div class="gallery-wall__ground"></div>
+      <div class="gallery-wall__scroll"
+        :style="{'margin-top':hangingPos+'px'}"
+        ref="scroll">
+        <div class="gallery-wall__card-wrapper">
+          <template v-for="(project) in galleryList.list">
+            <gallery-card
+              :data="project"
+              :key="project.id"
+              @click="(e)=>openPreviewHandler(project.id)"
+              :openState="project.openState"
+            ></gallery-card>
+          </template>
+        </div>
       </div>
-      <div class="gallery-wall__vertical-plane"></div>
     </section>
   </div>
 </template>
 
 <script>
 import galleryCard from 'src/components/gallery/galleryCard';
+import Simplebar from 'simplebar';
 import topNavigation from '../components/common/topNavigation';
 // eslint-disable-next-line
 import Hammer from 'hammerjs';
@@ -102,7 +107,7 @@ export default {
     centerCard(i) {
       const me = this;
       const dist = (((i * 326) + 430) - (this.wallSize.width / 2)) + 300;
-      let td = me.$refs.galleryWall.scrollLeft;
+      let td = me.$refs.scroll.scrollLeft;
 
       (function animateCenter() {
         td += 40;
@@ -125,13 +130,9 @@ export default {
   created() {
     // interaction methods defined using hammerjs
     this.$nextTick(() => {
+      this.simplebar = new Simplebar(this.$refs.scroll);
       const wallDom = this.$refs.galleryWall;
       const hammer = new Hammer(wallDom);
-      hammer.on('pan', (e) => {
-        const originX = wallDom.scrollLeft;
-        const panVel = 20;
-        wallDom.scrollLeft = originX - (e.velocityX * panVel);
-      });
       hammer.on('tap', () => {
         this.wallClickHandler();
       });

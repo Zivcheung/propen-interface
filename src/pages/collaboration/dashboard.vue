@@ -9,27 +9,43 @@
           @click="openCreateDialog"><i class="fas fa-plus"></i></el-button>
       </div>
       <div class="dashboard__projects-scroll" ref="project">
-         <el-card class="dashboard__project-card" v-for=" item in 20">
-          <div class="dashboard__project-card-title">A little cat service</div>
-          <span class="dashboard__project-card-tag">Members:</span>
-          <div class="dashboard__project-card-members">
-            <el-tag class="dashboard__project-card-member" size="mini" v-for="i in 10">Tian</el-tag>
+         <el-card class="dashboard__project-card"
+          v-for=" project in projectList"
+          :key="project.id">
+          <div
+            @click="enterProjectHandler(project)">
+            <div class="dashboard__project-card-title">{{project.name}}</div>
+            <span class="dashboard__project-card-tag">Members:</span>
+            <div class="dashboard__project-card-members">
+              <el-tag class="dashboard__project-card-member" size="mini" v-for="member in project.members"
+                :key="member">{{member}}</el-tag>
+            </div>
           </div>
         </el-card>
       </div>
     </div>
     <el-dialog
-      :visible.sync="centerDialog"
-      width="40%"
+      :visible.sync="showCenterDialog"
+      width="480px"
       center>
       <div class="dashboard__project-create">
         <h4>New Project</h4>
-        <el-form>
+        <el-form label-position="top">
           <el-form-item label="Project name">
-            <el-input></el-input>
+            <el-input
+              class="dashboard__project-create-input"
+              v-model="newProject.projectName"
+              ></el-input>
           </el-form-item>
           <el-form-item label="Members">
-            <el-input></el-input>
+            <el-select
+              class="dashboard__project-create-input"
+              v-model="newProject.members"
+              multiple
+              filterable
+              allow-create
+              default-first-option
+              placeholder="add member by email"></el-select>
           </el-form-item>
         </el-form>
         <el-button class=""
@@ -46,20 +62,59 @@ export default {
   name: 'dashboard',
   data() {
     return {
-      centerDialog: false,
+      showCenterDialog: false,
       newProject: {
         projectName: '',
-        members: '',
+        members: [],
       },
+      projectList: [],
     };
   },
   methods: {
+    clearNewProject() {
+      this.newProject.projectName = '';
+      this.newProject.members = [];
+    },
     openCreateDialog() {
-      this.centerDialog = true;
+      this.showCenterDialog = true;
+    },
+    enterProjectHandler(project) {
+      this.$router.push('/collaboration');
+      this.$store.commit('collabStore/setCurrentProjectId', project.id);
+    },
+    createProject() {
+      this.$$axios.post('newDocumentProject', {
+        projectName: this.newProject.projectName,
+        members: this.newProject.members,
+      })
+        .then((res) => {
+          this.clearNewProject();
+          this.showCenterDialog = false;
+        })
+        .catch((err) => {
+          alert(err);
+        });
+    },
+    getProjectList() {
+      this.$$axios.get('/documentProjects')
+        .then((res) => {
+          const data = res.data;
+          const projects = data.projects.map((item) => {
+            const members = [item.creator].concat(item.members);
+            return {
+              id: item._id,
+              name: item.name,
+              members,
+            };
+          });
+          this.projectList = projects;
+        })
+        .catch(err => alert(err));
     },
   },
   mounted() {
     // new SimpleBar(this.$refs.project);
+    this.getProjectList();
   },
 };
 </script>

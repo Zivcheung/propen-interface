@@ -1,5 +1,7 @@
 <template>
   <div class="document-editor__insertmenu-wp"
+    v-loading="uploading"
+    element-loading-spinner = "el-icon-loading"
     v-show="this.menu.show"
     :class="{'is-open':menu.open}"
     :style="menu.position">
@@ -39,14 +41,16 @@ export default {
   data() {
     // constant
     this.menuAlignOffset = {
-      top: -60,
+      top: -160, // pos from top of the window
       left: -50,
     };
 
     return {
+      uploading: false,
       menu: {
         open: false,
         show: true,
+        currentLine: undefined,
         position: {
           top: `${this.menuAlignOffset.top}px`,
           left: `${this.menuAlignOffset.left}px`,
@@ -74,10 +78,17 @@ export default {
         this.editor.subscribe('editableKeyup', this.toggleMenu);
       }
     },
+    closeMenu() {
+      this.menu.open = false;
+      this.menu.show = false;
+      this.menu.currentLine = undefined;
+    },
     toggleMenu() {
       // first close menu
       this.menu.open = false;
+
       const currentLine = this.editor.getSelectedParentElement();
+      this.menu.currentLine = currentLine;
       const currentPos = currentLine.getBoundingClientRect();
       const content = currentLine.innerHTML.replace(/<br>/, '').trim();
       if (!content) {
@@ -85,18 +96,48 @@ export default {
         this.menu.position.left = `${this.menuAlignOffset.left}px`;
         this.menu.position.top = `${currentPos.top + this.menuAlignOffset.top}px`;
       } else {
-        this.menu.open = false;
-        this.menu.show = false;
+        this.closeMenu();
       }
     },
     uploadFile() {
       const input = document.createElement('input');
       const formData = new FormData();
       input.type = 'file';
-      input.click();
-      input.addEventListener('change', () => {
+      input.onchange = (e) => {
         // ajax upload
-      });
+        const fileUrl = input.files[0];
+        const fileReader = new FileReader();
+        // register onload event
+        fileReader.onload = () => {
+          formData.set('file', fileUrl);
+          formData.set('projectId', this.$store.state.collabStore.currentProjectId);
+          // start loader
+          this.uploading = true;
+          // ajax
+          this.$$axios({
+            method: 'post',
+            url: '/imageUpload',
+            data: formData,
+            config: {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            },
+          }).then((res) => {
+            const data = res.data;
+            const imgEle = document.createElement('img');
+            const newLine = document.createElement('p');
+            newLine.innerHTML = '<br>';
+            this.uploading = false;
+            imgEle.src = data.url;
+            this.menu.currentLine.appendChild(imgEle);
+            this.menu.currentLine.parentNode.appendChild(newLine);
+          }).catch(err => alert(err));
+        };
+
+        fileReader.readAsDataURL(fileUrl);
+      };
+      input.click();
     },
     initEvent() {
       this.$$observer.$on('closeHideInsertMenu', () => {

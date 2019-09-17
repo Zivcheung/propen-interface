@@ -1,6 +1,7 @@
 <template>
-  <span class='radar-nav__instruction' @mouseenter='hover' @click='click' :style='cbStyle'>
+  <span class='radar-nav__instruction' @mouseenter='hover' @click='click' :style='{...cbStyle,...activeStyle}'>
     <span>-</span>
+    <span class="radar-nav__instruction-bg"></span>
     <span>{{ data.attr.title }}</span>
   </span>
 </template>
@@ -11,13 +12,6 @@ import event from 'src/utils/observer';
 
 export default {
   props: {
-    /*
-      data:{
-          id,
-          particle,
-          attr,
-        }
-    */
     data: {
       type: Object,
       requrie: true,
@@ -29,7 +23,13 @@ export default {
   data() {
     return {
       cbStyle: {},
+      selected: false,
     };
+  },
+  computed: {
+    activeStyle() {
+      return this.selected ? { color: 'red' } : { color: 'black' };
+    },
   },
   methods: {
     hover() {
@@ -38,6 +38,7 @@ export default {
     },
     click() {
       // select tag
+      this.selected = !this.selected;
       event.$emit('selectTag', this.data.attr.title);
     },
     init() {

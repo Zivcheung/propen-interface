@@ -29,7 +29,7 @@
                 </div>
                 <!-- dropdown's show behav is defined in css -->
                 <section class="top-nav__account-avatar-dropdown">
-                    <el-button type="text" @click="$router.push('/personalBoard')" >Personal Board</el-button>
+                    <el-button type="text" @click="$router.push('/dashboard')" >Personal Board</el-button>
                     <el-button type="text">Profile</el-button>
                     <el-button type="text">Account Setting</el-button>
                     <span class="top-nav__dropdown-spacer"></span>

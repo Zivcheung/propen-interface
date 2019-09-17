@@ -5,7 +5,6 @@
     </template>
     <div class="document-editor__scroll" ref="scroll">
       <section class="document-editor__editor" ref="editorSection"></section>
-      <button @click = "saveHandler">save</button>
     </div>
   </section>
 </template>
@@ -20,8 +19,12 @@ export default {
   components: {
     insertMenu,
   },
+  props: {
+    requestContent: String,
+  },
   data() {
     return {
+      loader: true,
       editor: null,
       editorOption: {
         placeholder: {
@@ -36,6 +39,7 @@ export default {
   methods: {
     initEditor() {
       this.editor = new MediumEditor(this.$refs.editorSection, this.editorOption);
+      this.editor.setContent(this.requestContent, 0);
     },
     destroyEditor() {
       this.editor.destroy();
@@ -47,11 +51,7 @@ export default {
       });
       simpleBar.getScrollElement().addEventListener('scroll', () => {
         this.$$observer.$emit('closeHideInsertMenu');
-        console.log('scroll');
       });
-    },
-    saveHandler() {
-      console.log(this.editor.serialize());
     },
   },
   mounted() {

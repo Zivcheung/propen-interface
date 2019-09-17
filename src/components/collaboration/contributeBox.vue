@@ -13,8 +13,10 @@
       </ul>
     </div>
     <!-- contribute new -->
-    <div class="contribox__new" v-if="type === 'contribute'">
-      <i class="fas fa-plus"></i>
+    <div class="contribox__new" v-if="type === 'contribute'"
+      @click="addNewContribution"
+      >
+      <i class="fas fa-plus" ></i>
     </div>
     <div class="contribox__close" @click="closeSelf">
       <i class="fas fa-plus"></i>
@@ -56,6 +58,11 @@ export default {
     };
   },
   methods: {
+    addNewContribution() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.click();
+    },
     mapTypeToIcon(type) {
       let iconClass = '';
       switch (type) {

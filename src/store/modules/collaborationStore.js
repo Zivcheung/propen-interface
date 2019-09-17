@@ -1,5 +1,7 @@
+import axios from 'src/plugins/mainAxios';
 
 const state = {
+  currentProjectId: '',
   contriItems: [
     {
       fileType: 'audio',
@@ -13,65 +15,59 @@ const state = {
       fileType: 'text',
       name: 'qwwwwwwwwwwwwwwwwwwwwwwwww',
     },
-    {
-      fileType: 'video',
-      name: 'recording(1)_fieldTrip',
-    },
-    {
-      fileType: 'graphic',
-      name: 'recording(1)_fieldTrip',
-    },
-    {
-      fileType: 'audio',
-      name: 'recording(1)_fieldTrip',
-    },
-    {
-      fileType: 'image',
-      name: 'recording(1)_fieldTrip',
-    },
-    {
-      fileType: 'text',
-      name: 'ffffffffffffffffiffffp',
-    },
-    {
-      fileType: 'video',
-      name: 'wwwwwwwwwwwwwwwwwwwwwwww',
-    },
-    {
-      fileType: 'graphic',
-      name: 'recording(1)_fieldTrip',
-    },
-    {
-      fileType: 'audio',
-      name: 'recording(1)_fieldTrip',
-    },
-    {
-      fileType: 'image',
-      name: 'recording(1)_fieldTrip',
-    },
-    {
-      fileType: 'text',
-      name: 'recording(1)_fieldTrip',
-    },
-    {
-      fileType: 'video',
-      name: 'recording(1)_fieldTrip',
-    },
-    {
-      fileType: 'graphic',
-      name: 'recording(1)_fieldTrip',
-    },
   ],
-  name: 1,
+  documentState: 'unloaded', // unloaded loaded
+  document: {
+    processes: [
+    ],
+    methods: [],
+  },
 };
 
 const mutations = {
+  setCurrentProjectId(state, id) {
+    state.currentProjectId = id;
+  },
+  setDocumentProcesses(state, processes) {
+    state.document.processes = processes;
+  },
+  setDocumentMethods(state, methods) {
+    state.document.methods = methods;
+  },
+  setDocumentState(state, docState) {
+    state.documentState = docState;
+  },
 };
 
 const getters = {
 };
 
 const actions = {
+  updateDocument({ state, commit }, payload) {
+    return axios.get('/processesList', {
+      params: {
+        projectId: state.currentProjectId,
+      },
+    })
+      .then((res) => {
+        const { data } = res.data;
+        const methods = data.reduce((acc, cur) => {
+          if (acc.indexOf(cur.methodName) < 0) {
+            acc.push(cur.methodName);
+          }
+          return acc;
+        }, []);
+        const sortedProcess = data.map(process => ({
+          ...process,
+          startDate: new Date(process.startDate),
+          endDate: new Date(process.endDate),
+        }))
+          .sort((a, b) => a.startDate - b.startDate);
+        commit('setDocumentProcesses', sortedProcess);
+        commit('setDocumentMethods', methods);
+        commit('setDocumentState', 'loaded');
+      });
+  },
 };
 
 export default {

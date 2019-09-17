@@ -1,6 +1,6 @@
 <template>
   <section>
-    <construction></construction>ß
+    <div class="exhibitionpool-placeholder"></div>
   </section>
 </template>
 

@@ -9,7 +9,8 @@ import exhibitionPool from 'src/pages/exhibitionPool';
 import projectIntro from 'src/pages/projectIntro';
 import projectNav from 'src/pages/projectNav';
 import collaboration from 'src/pages/collaboration/mainPanel';
-import compileCanvas from 'src/pages/collaboration/compileCanvas';
+  import process from 'src/components/collaboration/workingArea/processviz';
+  import compileCanvas from 'src/components/collaboration/workingArea/compileCanvas';
 import projectContent from 'src/pages/projectContent';
 import dashboard from 'src/pages/collaboration/dashboard';
 import store from '../store';
@@ -76,9 +77,19 @@ const router = new Router({
       path: '/collaboration',
       name: 'collaboration',
       meta: {
-        auth: 'required',
+        requiredAuth: true,
       },
       component: collaboration,
+      children: [
+        {
+          path: '',
+          component: process,
+        },
+        {
+          path: 'compile',
+          component: compileCanvas,
+        },
+      ],
     },
     // todo: need to add dynamic link
     {

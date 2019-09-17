@@ -40,7 +40,7 @@ export default class {
     this.selected = [];
     this.center = new PIXI.Point(pDataHolder.CANVAS_WIDTH / 2, pDataHolder.CANVAS_HEIGHT / 2);
     this.radian = (2 * Math.PI) / _tags.length;
-    this.radius = 330;
+    this.radius = 300;
 
     for (let i = 0, len = _tags.length; i < len; i++) {
       const rc = this.radius / Math.cos(this.radian / 2);
@@ -95,8 +95,5 @@ export default class {
       }
       i++;
     } while (i < len);
-  }
-  destroy() {
-    instance = null;
   }
 }

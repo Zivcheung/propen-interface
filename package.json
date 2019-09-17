@@ -21,6 +21,7 @@
     "moment": "^2.24.0",
     "pixi.js": "^4.8.7",
     "simplebar": "^4.0.0-alpha.6",
+    "socket.io-client": "^2.2.0",
     "vue": "^2.5.2",
     "vue-cookies": "^1.5.13",
     "vue-router": "^3.0.1",
